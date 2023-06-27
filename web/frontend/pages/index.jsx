@@ -23,9 +23,24 @@ export default function HomePage() {
   const { t } = useTranslation();
   const fetch = useAuthenticatedFetch();
   const [number, setNumber] = useState('');
+  const [code, setCode] = useState('')
 
-  const handleClick = async () => {
-    const res = await fetch("/api/test");
+
+
+  const sendOtp = async (e) => {
+    e.preventDefault();
+    if (number === "") {
+      return alert("Number is empty");
+    }
+    console.log('nm', number)
+    const res = await fetch("/api/send-otp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({number}),
+    });
+
     const json = await res.json();
     if (res.ok) {
       console.log("res ok");
@@ -35,19 +50,18 @@ export default function HomePage() {
       console.log(json);
     }
   };
-
-  const handleSubmit = async (e) => {
+  const verifyOtp = async (e) => {
     e.preventDefault();
-    if (number === "") {
+    if (code === "") {
       return alert("Number is empty");
     }
-    console.log('nm', number)
-    const res = await fetch("/api/send-code", {
+    console.log('code', code)
+    const res = await fetch("/api/verify-otp", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({number}),
+      body: JSON.stringify({code}),
     });
 
     const json = await res.json();
@@ -65,8 +79,7 @@ export default function HomePage() {
         TWILLIO
 
         {/* todo add phone select with country codes and flags underhood */}
-        <button onClick={handleClick}>click</button>
-        <Form method="post" onSubmit={handleSubmit}>
+        <Form method="post" onSubmit={sendOtp}>
           <label>
             Number
             <input
@@ -78,7 +91,23 @@ export default function HomePage() {
           </label>
 
             <button type="submit">
-              Submit
+              Send OTP
+            </button>
+        </Form>
+
+        <Form method="post" onSubmit={verifyOtp}>
+          <label>
+            Code
+            <input
+              type="text"
+              name="number"
+              value={code}
+              onChange={(e) =>  setCode(e.target.value) }
+            />
+          </label>
+
+            <button type="submit">
+              Verify OTP
             </button>
         </Form>
       </div>
@@ -87,7 +116,7 @@ export default function HomePage() {
       <Layout>
         <Layout.Section>
           <LegacyCard sectioned>
-            <Stack
+            {/* <Stack
               wrap={false}
               spacing="extraTight"
               distribution="trailing"
@@ -145,7 +174,7 @@ export default function HomePage() {
                   />
                 </div>
               </Stack.Item>
-            </Stack>
+            </Stack> */}
           </LegacyCard>
         </Layout.Section>
         <Layout.Section>
